@@ -272,8 +272,7 @@ extern "C"
     /**
      * @brief 				Defines whether a pin is an in- or output.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Port of the pin.
      * @param 	pin 		Selected pin.
      * @param 	io 			Set to 1 for input and 0 for output.
@@ -285,8 +284,7 @@ extern "C"
     /**
      * @brief 				Gets the current in-, output configuration for selected port.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Selected Port.
      * @param 	*ios 		Pointer to output variable.
      *
@@ -297,8 +295,7 @@ extern "C"
     /**
      * @brief 				Activates/deactivates the interrupt for selected pin.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Port of the pin.
      * @param 	pin 		Selected pin.
      * @param 	intr 		To enable interrupt set to 1, to disable it to 0.
@@ -310,8 +307,7 @@ extern "C"
     /**
      * @brief 				Gets current interrupt mask for selected port.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Selected port.
      * @param 	*intr 		Pointer to output variable.
      *
@@ -322,8 +318,7 @@ extern "C"
     /**
      * @brief 				Activates/deactivates the pull-up or pull-down resistor for selected pin.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Port of the pin.
      * @param 	pin 		Selected pin.
      * @param 	pull 		Set to 1 for pull-up and to 0 for pull-down.
@@ -336,8 +331,7 @@ extern "C"
     /**
      * @brief 				Gets current pull-up/pull-down configuration for selected port.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Selected port.
      * @param 	*pull 		Pointer to output variable for pull-up/pull-down configuration.
      * @param 	*active 	Pointer to output variable for pull-up/pull-down activation status.
@@ -349,8 +343,7 @@ extern "C"
     /**
      * @brief				Activates/deactivates the polarity inversion for selected pin.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Port of the pin.
      * @param 	pin 		Selected pin.
      * @param 	pol 		Set to 1 for inverted polarity and to 0 for normal operation.
@@ -362,8 +355,7 @@ extern "C"
     /**
      * @brief 				Gets current polarity configuration for selected port.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Selected port.
      * @param 	*pol 		Pointer to output variable for polarity configuration.
      *
@@ -374,8 +366,7 @@ extern "C"
     /**
      * @brief 				Sets trigger for interrupt for selected pin.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Port of the pin.
      * @param 	pin 		Selected pin.
      * @param 	trig 		0b00 trigger at change, 0b01 rising edge, 0b10 falling edge, 0b11 any edge.
@@ -387,8 +378,7 @@ extern "C"
     /**
      * @brief 				Gets current interrupt trigger configuration for selected port.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Selected port.
      * @param 	*trig 		Pointer to output variable for trigger configuration. 0b00 trigger at change, 0b01 rising edge, 0b10 falling edge, 0b11 any edge.
      *
@@ -399,8 +389,7 @@ extern "C"
     /**
      * @brief	 			Get value of selected pin.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Port of the pin.
      * @param 	pin 		Selected pin.
      * @param 	*value 		Pointer to output variable.
@@ -412,8 +401,7 @@ extern "C"
     /**
      * @brief 				Get value of selected port.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Selected port.
      * @param 	*values 	Pointer to output variable.
      *
@@ -424,8 +412,7 @@ extern "C"
     /**
      * @brief 				Gets interrupt register of selected port.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Selected port.
      * @param 	*values 	Pointer to output variable.
      *
@@ -436,8 +423,7 @@ extern "C"
     /**
      * @brief	 			Clears interrupt register and -pin.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      *
      * @retval 	uint8_t		Error code.
      */
@@ -446,8 +432,7 @@ extern "C"
     /**
      * @brief 				Outputs a value on selected pin. Only works if pin is set to output.
      *
-     * @param 	hi2c 		Configuration of I2C Port.
-     * @param 	addr 		Last two bits of the device address.
+     * @param   device      Struct with I2C handler and address pin status.
      * @param 	port 		Port of the pin.
      * @param 	pin 		Selected pin.
      * @param 	value 		Output value.
