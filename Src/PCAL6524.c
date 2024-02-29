@@ -30,8 +30,8 @@ uint8_t PCAL6524_WriteI2C(pcal6524_Device_t *device, uint8_t regAdress, uint8_t 
 
 uint8_t PCAL6524_SetInOut(pcal6524_Device_t *device, pcal6524_Port_t port, pcal6524_Pin_t pin, pcal6524_InOut_t io)
 {
-    uint8_t i2cData = 0;   // Holds data for i2c communication.
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t data = 0;   // Holds data for i2c communication.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2 || pin > 7 || io > 1)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -42,20 +42,20 @@ uint8_t PCAL6524_SetInOut(pcal6524_Device_t *device, pcal6524_Port_t port, pcal6
         switch (port)
         { // Reads current setting of register.
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_0, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_1, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_2, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -66,32 +66,32 @@ uint8_t PCAL6524_SetInOut(pcal6524_Device_t *device, pcal6524_Port_t port, pcal6
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Combines current value of register with value that has to be changed. */
-    i2cData = (i2cData & (~(1 << pin))) | (io << pin);
+    data = (data & (~(1 << pin))) | (io << pin);
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
         switch (port)
         { // Sends changed register settings to chip.
         case 0:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_CONF_PORT_0, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_CONF_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_CONF_PORT_1, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_CONF_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_CONF_PORT_2, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_CONF_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -102,15 +102,15 @@ uint8_t PCAL6524_SetInOut(pcal6524_Device_t *device, pcal6524_Port_t port, pcal6
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
 uint8_t PCAL6524_GetInOutConfig(pcal6524_Device_t *device, pcal6524_Port_t port, uint8_t *ios)
 {
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -122,20 +122,20 @@ uint8_t PCAL6524_GetInOutConfig(pcal6524_Device_t *device, pcal6524_Port_t port,
         { // Reads current setting of register.
         case 0:
 
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_0, ios);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_0, ios);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_1, ios);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_1, ios);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_2, ios);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_CONF_PORT_2, ios);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -146,9 +146,9 @@ uint8_t PCAL6524_GetInOutConfig(pcal6524_Device_t *device, pcal6524_Port_t port,
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -156,8 +156,8 @@ uint8_t PCAL6524_SetInterrupt(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     pcal6524_Pin_t pin, pcal6524_InterruptEN_t intr)
 {
-    uint8_t i2cData = 0;   // Holds data for i2c communication.
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t data = 0;   // Holds data for i2c communication.
+    uint8_t status = 0; // Holds i2c status for error catching.
     /* Checks for input errors. */
     if (port > 2 || pin > 7 || intr > 1)
     {
@@ -168,20 +168,20 @@ uint8_t PCAL6524_SetInterrupt(
         switch (port)
         { // Reads current setting of register.
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_0, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_1, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_2, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -192,32 +192,32 @@ uint8_t PCAL6524_SetInterrupt(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Combines current value of register with value that has to be changed. */
-    i2cData = (i2cData & (~(0b1 << pin))) | (~(intr) << pin);
+    data = (data & (~(0b1 << pin))) | (~(intr) << pin);
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
         switch (port)
         { // Sends changed register settings to chip.
         case 0:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_MASK_PORT_0, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_MASK_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_MASK_PORT_1, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_MASK_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_MASK_PORT_2, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_MASK_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -228,9 +228,9 @@ uint8_t PCAL6524_SetInterrupt(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -238,7 +238,7 @@ uint8_t PCAL6524_GetInterruptConfig(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     uint8_t *intr)
 {
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -249,20 +249,20 @@ uint8_t PCAL6524_GetInterruptConfig(
         switch (port)
         { // Reads current setting of register.
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_0, intr);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_0, intr);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_1, intr);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_1, intr);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_2, intr);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_MASK_PORT_2, intr);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -273,9 +273,9 @@ uint8_t PCAL6524_GetInterruptConfig(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -284,8 +284,8 @@ uint8_t PCAL6524_SetPullupDown(
     pcal6524_Pin_t pin, pcal6524_PullUpDown_t pull,
     pcal6524_PullUpDownEN_t active)
 {
-    uint8_t i2cData = 0;   // Holds data for i2c communication.
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t data = 0;   // Holds data for i2c communication.
+    uint8_t status = 0; // Holds i2c status for error catching.
     /* Checks for input errors. */
     if (port > 2 || pin > 7 || pull > 1 || active > 1)
     {
@@ -298,20 +298,20 @@ uint8_t PCAL6524_SetPullupDown(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_0, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_1, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_2, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -322,12 +322,12 @@ uint8_t PCAL6524_SetPullupDown(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Combines current value of register with value that has to be changed. */
-    i2cData = (i2cData & (~(0b1 << pin))) | (pull << pin);
+    data = (data & (~(0b1 << pin))) | (pull << pin);
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
@@ -335,20 +335,20 @@ uint8_t PCAL6524_SetPullupDown(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_SEL_PORT_0, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_SEL_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_SEL_PORT_1, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_SEL_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_SEL_PORT_2, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_SEL_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -359,9 +359,9 @@ uint8_t PCAL6524_SetPullupDown(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
@@ -370,20 +370,20 @@ uint8_t PCAL6524_SetPullupDown(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_0, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_1, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_2, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -394,12 +394,12 @@ uint8_t PCAL6524_SetPullupDown(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Combines current value of register with value that has to be changed. */
-    i2cData = (i2cData & (~(0b1 << pin))) | (active << pin);
+    data = (data & (~(0b1 << pin))) | (active << pin);
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
@@ -407,20 +407,20 @@ uint8_t PCAL6524_SetPullupDown(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_EN_PORT_0, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_EN_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_EN_PORT_1, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_EN_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_EN_PORT_2, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_PULL_EN_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -431,9 +431,9 @@ uint8_t PCAL6524_SetPullupDown(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -441,7 +441,7 @@ uint8_t PCAL6524_GetPullupDownConfig(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     uint8_t *pull, uint8_t *active)
 {
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -453,20 +453,20 @@ uint8_t PCAL6524_GetPullupDownConfig(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_0, pull);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_0, pull);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_1, pull);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_1, pull);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_2, pull);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_SEL_PORT_2, pull);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -477,9 +477,9 @@ uint8_t PCAL6524_GetPullupDownConfig(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
@@ -488,20 +488,20 @@ uint8_t PCAL6524_GetPullupDownConfig(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_0, active);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_0, active);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_1, active);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_1, active);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_2, active);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_PULL_EN_PORT_2, active);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -512,9 +512,9 @@ uint8_t PCAL6524_GetPullupDownConfig(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -522,8 +522,8 @@ uint8_t PCAL6524_SetPolarity(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     pcal6524_Pin_t pin, pcal6524_Polarity_t pol)
 {
-    uint8_t i2cData = 0;   // Holds data for i2c communication.
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t data = 0;   // Holds data for i2c communication.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2 || pin > 7 || pol > 1)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -534,20 +534,20 @@ uint8_t PCAL6524_SetPolarity(
         switch (port)
         { // Reads current setting of register.
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_0, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_1, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_2, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -558,32 +558,32 @@ uint8_t PCAL6524_SetPolarity(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Combines current value of register with value that has to be changed. */
-    i2cData = (i2cData & (~(0b1 << pin))) | (pol << pin);
+    data = (data & (~(0b1 << pin))) | (pol << pin);
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
         switch (port)
         { // Sends changed register settings to chip.
         case 0:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_POL_PORT_0, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_POL_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_POL_PORT_1, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_POL_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_POL_PORT_2, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_POL_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -594,9 +594,9 @@ uint8_t PCAL6524_SetPolarity(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -604,7 +604,7 @@ uint8_t PCAL6524_GetPolarityConfig(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     uint8_t *pol)
 {
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -615,20 +615,20 @@ uint8_t PCAL6524_GetPolarityConfig(
         switch (port)
         { // Reads current setting of register.
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_0, pol);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_0, pol);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_1, pol);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_1, pol);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_2, pol);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_POL_PORT_2, pol);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -639,9 +639,9 @@ uint8_t PCAL6524_GetPolarityConfig(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -649,8 +649,8 @@ uint8_t PCAL6524_SetInterruptTrigger(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     pcal6524_Pin_t pin, pcal6524_InterruptTrigger_t trig)
 {
-    uint8_t i2cData = 0;   // Holds data for i2c communication.
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t data = 0;   // Holds data for i2c communication.
+    uint8_t status = 0; // Holds i2c status for error catching.
     /* Checks for input errors. */
     if (port > 2 || pin > 7 || trig > 0b11)
     {
@@ -664,39 +664,39 @@ uint8_t PCAL6524_SetInterruptTrigger(
         case 0:
             if (pin < 4)
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0A, &i2cData);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0A, &data);
             }
             else
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0B, &i2cData);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0B, &data);
             }
             break;
         case 1:
             if (pin < 4)
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1A, &i2cData);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1A, &data);
             }
             else
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1B, &i2cData);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1B, &data);
             }
             break;
         case 2:
             if (pin < 4)
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2A, &i2cData);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2A, &data);
             }
             else
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2B, &i2cData);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2B, &data);
             }
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -707,12 +707,12 @@ uint8_t PCAL6524_SetInterruptTrigger(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Combines current value of register with value that has to be changed. */
-    i2cData = (i2cData & (~(0b1 << (2 * (pin % 4))))) | (trig << (2 * (pin % 4)));
+    data = (data & (~(0b1 << (2 * (pin % 4))))) | (trig << (2 * (pin % 4)));
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
@@ -721,39 +721,39 @@ uint8_t PCAL6524_SetInterruptTrigger(
         case 0:
             if (pin < 4)
             {
-                halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_0A, &i2cData);
+                status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_0A, &data);
             }
             else
             {
-                halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_0B, &i2cData);
+                status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_0B, &data);
             }
             break;
         case 1:
             if (pin < 4)
             {
-                halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_1A, &i2cData);
+                status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_1A, &data);
             }
             else
             {
-                halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_1B, &i2cData);
+                status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_1B, &data);
             }
             break;
         case 2:
             if (pin < 4)
             {
-                halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_2A, &i2cData);
+                status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_2A, &data);
             }
             else
             {
-                halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_2B, &i2cData);
+                status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_EGDE_PORT_2B, &data);
             }
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -764,9 +764,9 @@ uint8_t PCAL6524_SetInterruptTrigger(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -774,7 +774,7 @@ uint8_t PCAL6524_GetInterruptTriggerConfig(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     pcal6524_Pin_t pin, pcal6524_InterruptTrigger_t *trig)
 {
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2 || pin > 7)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -787,39 +787,39 @@ uint8_t PCAL6524_GetInterruptTriggerConfig(
         case 0:
             if (pin < 4)
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0A, trig);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0A, trig);
             }
             else
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0B, trig);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_0B, trig);
             }
             break;
         case 1:
             if (pin < 4)
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1A, trig);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1A, trig);
             }
             else
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1B, trig);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_1B, trig);
             }
             break;
         case 2:
             if (pin < 4)
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2A, trig);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2A, trig);
             }
             else
             {
-                halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2B, trig);
+                status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_EGDE_PORT_2B, trig);
             }
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -830,9 +830,9 @@ uint8_t PCAL6524_GetInterruptTriggerConfig(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -840,8 +840,8 @@ uint8_t PCAL6524_GetPinValue(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     pcal6524_Pin_t pin, pcal6524_Value_t *value)
 {
-    uint8_t i2cData = 0;   // Holds data for i2c communication.
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t data = 0;   // Holds data for i2c communication.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2 || pin > 7)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -853,20 +853,20 @@ uint8_t PCAL6524_GetPinValue(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_STATUS_PORT_0, value);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_STATUS_PORT_0, value);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_STATUS_PORT_1, value);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_STATUS_PORT_1, value);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_STATUS_PORT_2, value);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_STATUS_PORT_2, value);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -877,32 +877,32 @@ uint8_t PCAL6524_GetPinValue(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     *value = (*value & (1 << pin)) >> pin; // Picks out wanted pin value.
-    i2cData = 1 << pin;
+    data = 1 << pin;
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
         switch (port)
         { // Resets interrupt on read pin.
         case 0:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_0, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_1, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_2, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -913,9 +913,9 @@ uint8_t PCAL6524_GetPinValue(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -923,8 +923,8 @@ uint8_t PCAL6524_OutputValue(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     pcal6524_Pin_t pin, pcal6524_Value_t value)
 {
-    uint8_t i2cData = 0;   // Holds data for i2c communication.
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t data = 0;   // Holds data for i2c communication.
+    uint8_t status = 0; // Holds i2c status for error catching.
     /* Checks for input errors. */
     if (port > 2 || pin > 7 || value > 1)
     {
@@ -936,20 +936,20 @@ uint8_t PCAL6524_OutputValue(
         switch (port)
         { // Reads current setting of register.
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_OUT_PORT_0, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_OUT_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_OUT_PORT_1, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_OUT_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_OUT_PORT_2, &i2cData);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_OUT_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -960,32 +960,32 @@ uint8_t PCAL6524_OutputValue(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     /* Combines current value of register with value that has to be changed. */
-    i2cData = (i2cData & (~(0b1 << pin))) | (value << pin);
+    data = (data & (~(0b1 << pin))) | (value << pin);
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
         switch (port)
         { // Sends changed register settings to chip.
         case 0:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_OUT_PORT_0, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_OUT_PORT_0, &data);
             break;
         case 1:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_OUT_PORT_1, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_OUT_PORT_1, &data);
             break;
         case 2:
-            halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_OUT_PORT_2, &i2cData);
+            status = PCAL6524_WriteI2C(device, PCAL6524_REG_OUT_PORT_2, &data);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -996,9 +996,9 @@ uint8_t PCAL6524_OutputValue(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -1006,7 +1006,7 @@ uint8_t PCAL6524_GetPortPinValues(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     uint8_t *values)
 {
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -1018,20 +1018,20 @@ uint8_t PCAL6524_GetPortPinValues(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_PORT_0, values);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_PORT_0, values);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_PORT_1, values);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_PORT_1, values);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_PORT_2, values);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_IN_PORT_2, values);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -1042,9 +1042,9 @@ uint8_t PCAL6524_GetPortPinValues(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
@@ -1052,7 +1052,7 @@ uint8_t PCAL6524_GetInterrupts(
     pcal6524_Device_t *device, pcal6524_Port_t port,
     uint8_t *intr)
 {
-    uint8_t halStatus = 0; // Holds i2c status for error catching.
+    uint8_t status = 0; // Holds i2c status for error catching.
     if (port > 2)
     { // Checks for input errors.
         return PCAL6524_INPUTOUTOFRANGE;
@@ -1064,20 +1064,20 @@ uint8_t PCAL6524_GetInterrupts(
         switch (port)
         {
         case 0:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_STAT_PORT_0, intr);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_STAT_PORT_0, intr);
             break;
         case 1:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_STAT_PORT_1, intr);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_STAT_PORT_1, intr);
             break;
         case 2:
-            halStatus = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_STAT_PORT_2, intr);
+            status = PCAL6524_ReadI2C(device, PCAL6524_REG_INT_STAT_PORT_2, intr);
             break;
         }
-        if (halStatus == HAL_OK)
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -1088,25 +1088,25 @@ uint8_t PCAL6524_GetInterrupts(
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
 uint8_t PCAL6524_ClearAllInterrupts(pcal6524_Device_t *device)
 {
-    uint8_t i2cData = 0b11111111; // Holds data for i2c communication.
-    uint8_t halStatus = 0;        // Holds i2c status for error catching.
+    uint8_t data = 0b11111111; // Holds data for i2c communication.
+    uint8_t status = 0;        // Holds i2c status for error catching.
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
-        halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_0, &i2cData);
-        if (halStatus == HAL_OK)
+        status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_0, &data);
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -1119,12 +1119,12 @@ uint8_t PCAL6524_ClearAllInterrupts(pcal6524_Device_t *device)
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
-        halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_1, &i2cData);
-        if (halStatus == HAL_OK)
+        status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_1, &data);
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -1137,12 +1137,12 @@ uint8_t PCAL6524_ClearAllInterrupts(pcal6524_Device_t *device)
     /* Repeats i2c call, in case of busy i2c unit. */
     for (uint8_t attempt = 0; attempt <= PCAL6524_I2C_MAX_ATTEMPTS; attempt++)
     {
-        halStatus = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_2, &i2cData);
-        if (halStatus == HAL_OK)
+        status = PCAL6524_WriteI2C(device, PCAL6524_REG_INT_CLEAR_PORT_2, &data);
+        if (status == HAL_OK)
         { // Breaks out of loop when successful.
             break;
         }
-        else if (halStatus == HAL_ERROR)
+        else if (status == HAL_ERROR)
         { // Returns error when i2c unit fails.
             return HAL_ERROR;
         }
@@ -1153,9 +1153,9 @@ uint8_t PCAL6524_ClearAllInterrupts(pcal6524_Device_t *device)
         }
     }
     /* Catches case when all attempts failed and returns last error code. */
-    if (halStatus > HAL_OK)
+    if (status > HAL_OK)
     {
-        return halStatus;
+        return status;
     }
     return PCAL6524_SUCCESS; // Returns success code when transmission successful.
 }
